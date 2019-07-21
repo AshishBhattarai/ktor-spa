@@ -8,7 +8,6 @@ import io.ktor.http.content.*
 import io.ktor.request.acceptItems
 import io.ktor.request.uri
 import io.ktor.response.ApplicationSendPipeline
-import io.ktor.response.contentType
 import io.ktor.response.respond
 import io.ktor.response.respondFile
 import io.ktor.routing.routing
@@ -16,7 +15,6 @@ import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
 import java.io.File
 import java.io.FileNotFoundException
-import java.nio.file.Path
 import java.nio.file.Paths
 
 /**
@@ -26,7 +24,7 @@ import java.nio.file.Paths
 class SinglePageApplication(private val configuration: Configuration) {
 
     companion object Feature :
-        ApplicationFeature<Application, SinglePageApplication.Configuration, SinglePageApplication> {
+        ApplicationFeature<Application, Configuration, SinglePageApplication> {
 
         override val key = AttributeKey<SinglePageApplication>("SinglePageApplication")
 
@@ -85,7 +83,7 @@ class SinglePageApplication(private val configuration: Configuration) {
         call.attributes.put(key, this@SinglePageApplication)
 
         if (configuration.useFiles) {
-            val file = configuration.fullPath().toFile()
+            val file = File(configuration.folderPath)
             if (file.notExists()) throw FileNotFoundException("${configuration.fullPath()} not found")
             call.respondFile(file, configuration.defaultPage)
         } else {
